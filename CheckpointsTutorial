@@ -1,0 +1,120 @@
+// Checkpoint.cs
+using UnityEngine;
+
+public class Checkpoint : MonoBehaviour
+{
+    public Transform checkpoint;
+    private GameObject player;
+
+    void Start()
+    {
+        player = GameObject.FindWithTag("Player");
+    }
+
+    void OnTriggerEnter(Collider plyr)
+    {
+        if (plyr.CompareTag("Player"))
+        {
+            player.transform.position = checkpoint.position;
+            player.transform.rotation = checkpoint.rotation;
+        }
+    }
+}
+
+// ChangeCheckpoint.cs
+using UnityEngine;
+
+public class ChangeCheckpoint : MonoBehaviour
+{
+    public GameObject checkpoint;
+
+    void OnTriggerEnter(Collider plyr)
+    {
+        if (plyr.CompareTag("Player"))
+        {
+            if (checkpoint != null)
+            {
+                Destroy(checkpoint);
+            }
+            Destroy(gameObject);
+        }
+    }
+}
+
+/*
+### Detailed Tutorial: Implementing Checkpoint and ChangeCheckpoint Scripts ###
+
+#### Step 1: Setting Up the Unity Scene
+
+1. **Create a New Scene**:
+   - In Unity, go to `File > New Scene` and save it as `CheckpointSystem`.
+
+2. **Set Up the Ground**:
+   - Create a plane as the ground (`GameObject > 3D Object > Plane`).
+   - Rename it to "Ground" and ensure it is large enough for testing.
+
+3. **Create the Player**:
+   - Add a capsule to the scene (`GameObject > 3D Object > Capsule`).
+   - Rename it "Player".
+   - Add a Rigidbody component to the Player (`Inspector > Add Component > Rigidbody`).
+   - Tag the Player GameObject as "Player".
+
+#### Step 2: Adding Checkpoints
+
+1. **Create Checkpoint GameObjects**:
+   - Add empty GameObjects for each checkpoint (`GameObject > Create Empty`).
+   - Rename them (e.g., "Checkpoint1", "Checkpoint2").
+   - Position them at desired locations in the scene.
+
+2. **Add Visual Markers**:
+   - Add 3D objects (e.g., cubes or spheres) as visual markers at the checkpoint positions.
+   - Parent the visual markers to the corresponding checkpoint GameObjects.
+
+3. **Attach the `Checkpoint` Script**:
+   - Attach the `Checkpoint.cs` script to the visual marker GameObject.
+   - Assign the `checkpoint` field in the Inspector to the parent checkpoint's transform.
+
+#### Step 3: Adding Change Checkpoints
+
+1. **Create Change Checkpoint GameObjects**:
+   - Add empty GameObjects (`GameObject > Create Empty`) at locations where the checkpoint should change.
+   - Rename them (e.g., "ChangeCheckpoint1").
+
+2. **Attach the `ChangeCheckpoint` Script**:
+   - Attach the `ChangeCheckpoint.cs` script to each Change Checkpoint GameObject.
+   - Assign the `checkpoint` field to the GameObject of the old checkpoint that should be destroyed.
+
+#### Step 4: Testing the Scene
+
+1. **Play the Game**:
+   - Click the "Play" button in Unity.
+   - Move the Player to trigger checkpoints and observe the Player's position and rotation resetting upon re-entering the checkpoints.
+
+2. **Simulate Changing Checkpoints**:
+   - Move the Player into a Change Checkpoint trigger and confirm the old checkpoint is destroyed.
+   - Ensure subsequent re-entry of the Player at a new checkpoint works as expected.
+
+#### Step 5: Polishing
+
+1. **Add Feedback**:
+   - Add a UI text element (`GameObject > UI > Text`) to display checkpoint activation messages.
+   - Extend the scripts to show messages when a checkpoint is activated or changed.
+
+2. **Use Gizmos for Visualization**:
+   - Add Gizmo drawing in the `Checkpoint` and `ChangeCheckpoint` scripts to visualize triggers in the Scene view.
+     ```csharp
+     void OnDrawGizmos()
+     {
+         Gizmos.color = Color.green;
+         Gizmos.DrawWireSphere(transform.position, 1f);
+     }
+     ```
+
+3. **Customize Appearance**:
+   - Change the visual markers to suit your game’s theme.
+   - Add animations or particle effects to checkpoints.
+
+#### Additional Notes
+- Save your scene and project frequently to avoid data loss.
+- Test edge cases, such as entering multiple checkpoints quickly or destroying checkpoints out of order.
+*/
