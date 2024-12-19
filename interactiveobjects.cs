@@ -77,7 +77,7 @@ public class PickUp : MonoBehaviour
 
         if (money && moneyScript != null)
         {
-            moneyScript.gold += moneyAmount;
+            moneyScript.AddGold(moneyAmount);
             Destroy(gameObject);
         }
         else if (item && invScript != null)
@@ -189,6 +189,72 @@ public class ThrowObject : MonoBehaviour
     }
 }
 
+// Currency.cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class Currency : MonoBehaviour
+{
+    public int gold;
+    private GameObject currencyUI;
+
+    void Start()
+    {
+        currencyUI = GameObject.Find("Currency");
+        UpdateCurrencyUI();
+    }
+
+    public void AddGold(int amount)
+    {
+        gold = Mathf.Max(0, gold + amount);
+        UpdateCurrencyUI();
+    }
+
+    private void UpdateCurrencyUI()
+    {
+        if (currencyUI != null)
+        {
+            var textComponent = currencyUI.GetComponent<Text>();
+            if (textComponent != null)
+            {
+                textComponent.text = gold.ToString();
+            }
+        }
+    }
+}
+
+// PickupMoney.cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PickupMoney : MonoBehaviour
+{
+    private Currency currencyScript;
+
+    public int addAmount;
+
+    void Start()
+    {
+        var gameController = GameObject.FindWithTag("GameController");
+        if (gameController != null)
+        {
+            currencyScript = gameController.GetComponent<Currency>();
+        }
+    }
+
+    void OnTriggerEnter(Collider obj)
+    {
+        if (obj.CompareTag("Player") && currencyScript != null)
+        {
+            currencyScript.AddGold(addAmount);
+            Destroy(gameObject);
+        }
+    }
+}
+
 /*
 ### Tutorial: How to Implement and Use These Scripts in Unity ###
 
@@ -202,6 +268,8 @@ public class ThrowObject : MonoBehaviour
 - **ThrowObject.cs**: Attach this script to objects the player can throw.
 - **Inventory.cs**: Attach this script to a GameObject managing the inventory system.
 - **UseInventory.cs**: Attach this script to consumable or usable item prefabs.
+- **Currency.cs**: Attach this script to the GameController to manage currency.
+- **PickupMoney.cs**: Attach this script to money objects that can be picked up.
 
 #### Step 3: Configure GameObjects
 1. **Objects to Collect**:
@@ -222,14 +290,14 @@ public class ThrowObject : MonoBehaviour
    - Attach the `PickUp` script to objects.
    - Configure the `money`, `moneyAmount`, `item`, and `itemIcon` properties in the Inspector.
 
-5. **Throwable Objects**:
-   - Attach the `ThrowObject` script to the objects you want throwable.
-   - Assign the `player` and `playerCam` Transforms to the player and camera objects, respectively.
-   - Add an AudioSource component and populate the `soundToPlay` array.
+5. **Money Objects**:
+   - Attach the `PickupMoney` script to money objects.
+   - Set the `addAmount` property in the Inspector to define how much gold the object adds.
 
 6. **UI Setup**:
    - Create sliders for health, hunger, and thirst, and link them to the respective properties in the `ThirdPersonCharacter` script.
    - Add buttons or interactive elements to use items and call `UseItem` in the `UseInventory` script.
+   - Add a UI Text element named "Currency" to display the player's gold amount.
 
 #### Step 4: Input Configuration
 - Ensure that input mappings for "Use", "Tab", and mouse buttons are set in Unity's Input Manager.
@@ -241,6 +309,7 @@ public class ThrowObject : MonoBehaviour
 2. Move the player near objects and test collecting, picking up, and throwing objects.
 3. Toggle the inventory using the `Tab` key and interact with items.
 4. Observe sliders for health, hunger, and thirst values, and verify their changes during gameplay.
+5. Collect money objects and confirm that the currency UI updates correctly.
 
 #### Notes:
 - Adjust the `throwForce` value in the `ThrowObject` script to control the throwing distance.
