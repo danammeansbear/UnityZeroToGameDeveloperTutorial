@@ -1,30 +1,33 @@
 // Updated Bullet Script
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    // Time after which the bullet will automatically be destroyed
     [SerializeField] private float lifeTime = 5f;
+    [SerializeField] private float damage = 10f; // Amount of damage the bullet causes
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         Destroy(gameObject, lifeTime); // Destroy the bullet after its lifetime expires
     }
 
-    // OnCollisionEnter is called when the bullet collides with another object
     private void OnCollisionEnter(Collision collision)
     {
-        // Optional: Add effects here (e.g., sparks, sounds, etc.)
+        // Check if the collided object has a Health component
+        Health health = collision.gameObject.GetComponent<Health>();
+        if (health != null)
+        {
+            health.TakeDamage(damage); // Apply damage to the object
+        }
 
-        Destroy(gameObject); // Destroy the bullet upon collision
+        // Destroy the bullet upon collision
+        Destroy(gameObject);
     }
 }
 
 /* ==================== TUTORIAL FOR IMPLEMENTATION ====================
-This guide will help you implement the Bullet script with the Gun script provided earlier.
+This guide will help you implement the Bullet script with the Gun script provided earlier, 
+including functionality for causing damage to other objects.
 
 1. **Set Up the Bullet Prefab:**
    - Create a GameObject in your Unity scene that will represent the bullet (e.g., a small sphere).
@@ -49,13 +52,25 @@ This guide will help you implement the Bullet script with the Gun script provide
 5. **Adjust Bullet Speed:**
    - In the `Gun` script component in the Inspector, set an appropriate value for `Bullet Speed`. This determines how fast the bullets travel.
 
-6. **Test the Setup:**
+6. **Enable Damage Application:**
+   - Ensure that objects in your scene that can take damage have a `Health` component attached.
+   - The `Health` script should include methods for reducing health and destroying the object when health reaches zero.
+   - The `Bullet` script will automatically detect collisions with objects that have the `Health` component and apply damage.
+
+7. **Test the Setup:**
    - Press the Play button in Unity.
    - Press the left mouse button (or the key mapped to `Fire1`) to fire bullets.
-   - Bullets should spawn at the `Bullet Spawn` position, move forward, and be destroyed either after a set lifetime or upon collision.
+   - Bullets should spawn at the `Bullet Spawn` position, move forward, and apply damage to objects with a `Health` component.
+   - Watch the target's health decrease in the Console log (or add UI for visual feedback).
 
-7. **Enhancements:**
+8. **Enhancements:**
    - Add particle effects or sounds when the bullet is fired or collides with an object.
-   - Consider implementing additional logic, such as dealing damage to objects hit by the bullet.
+   - Customize the `damage` value in the `Bullet` script to vary damage for different bullet types.
+   - Implement a visual health bar on target objects for easier testing and gameplay immersion.
+
+9. **Advanced Features (Optional):**
+   - Introduce additional mechanics such as armor or shields by modifying the `Health` script.
+   - Integrate networking for multiplayer damage synchronization.
 
 ==================================================================== */
+
